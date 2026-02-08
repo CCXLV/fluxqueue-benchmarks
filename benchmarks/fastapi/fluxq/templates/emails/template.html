@@ -1,0 +1,155 @@
+<div
+  style="
+    background-color: #fcfcfc;
+    padding: 16px;
+    font-family:
+      -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial,
+      sans-serif;
+  "
+>
+  <table
+    align="center"
+    border="0"
+    role="presentation"
+    style="
+      width: 620px;
+      margin: 0 auto;
+      border-radius: 8px;
+      border: 1px solid #e2e2e2;
+      background-color: #fdfdfd;
+    "
+  >
+    <tbody>
+      <tr>
+        <td style="padding: 16px">
+          <div style="padding-bottom: 24px">
+            <table style="width: 100%">
+              <tbody>
+                <tr>
+                  <td align="left">
+                    <div
+                      style="
+                        width: 64px;
+                        height: 64px;
+                        border-radius: 8px;
+                        border: 1px solid #e2e2e2;
+                      "
+                    >
+                      <table
+                        width="100%"
+                        height="100%"
+                        cellpadding="0"
+                        cellspacing="0"
+                        border="0"
+                        style="text-align: center"
+                      >
+                        <tr>
+                          <td align="center" valign="middle">
+                            <a
+                              href="{{ docs_url }}"
+                              style="
+                                display: block;
+                                width: 64px;
+                                margin: 0 auto;
+                              "
+                            >
+                              <img
+                                src="{{ logo_url }}"
+                                alt="LernaFlow"
+                                style="
+                                  display: block;
+                                  width: 100%;
+                                  margin: 0 auto;
+                                "
+                              />
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div style="padding-bottom: 32px">
+            <table style="width: 100%">
+              <tbody>
+                <tr>
+                  <td align="left" style="font-size: 14px; color: #24211e">
+                    <p
+                      style="
+                        margin: 0px;
+                        font-weight: 600;
+                        font-size: 24px;
+                        line-height: 32px;
+                      "
+                    >
+                      {{ header }}
+                    </p>
+                    <p style="margin: 14px 0 0 0; line-height: 20px">
+                      {{ content }}
+                    </p>
+                  </td>
+                </tr>
+              </tbody>
+              {% if middle_content %}
+              <tr>
+                <td align="center" style="padding-top: 16px">
+                  <table style="width: 100%; height: 48px">
+                    <tbody style="height: 48px">
+                      <tr>
+                        <td align="center">
+                          {% if middle_content.link %}
+                          <a
+                            href="{{ middle_content.link.href }}"
+                            style="
+                              padding: 12px 36px;
+                              border-radius: 6px;
+                              background-color: #d64d0f;
+                              width: 250px;
+                              color: #e8e7e7;
+                              font-size: 18px;
+                              font-weight: 600;
+                              text-decoration: none;
+                            "
+                          >
+                            {{ middle_content.link.text }}
+                          </a>
+                          {% endif %}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              {% endif %}
+            </table>
+          </div>
+          <div
+            style="width: 100%; height: 1px; background-color: #d9d9d9"
+          ></div>
+          <div style="padding-top: 20px">
+            <table style="width: 100%">
+              <tbody>
+                <tr>
+                  <td
+                    align="left"
+                    style="font-size: 12px; color: #636161; line-height: 16px"
+                  >
+                    <p style="margin: 0">{{ footer_top }}</p>
+                    {% if footer_bottom %}
+                    <div style="margin-top: 10px">
+                      <p style="margin: 0">{{ footer_bottom }}</p>
+                    </div>
+                    {% endif %}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
