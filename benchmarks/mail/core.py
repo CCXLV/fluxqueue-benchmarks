@@ -6,7 +6,7 @@ from typing import TypedDict
 import aiosmtplib
 from fastapi.templating import Jinja2Templates
 
-from benchmarks.fastapi.fluxq.config import BASE_DIR, DOCS_URL, LOGO_URL
+from benchmarks.config import BASE_DIR, DOCS_URL, LOGO_URL
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 

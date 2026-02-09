@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from benchmarks.fastapi.fluxq.api import api_router
+from benchmarks.api import api_router
 
 api = FastAPI()
 

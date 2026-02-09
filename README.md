@@ -1,6 +1,6 @@
 # FluxQueue Benchmarks
 
-Performance benchmarks comparing FluxQueue and Celery across different workloads.
+Performance benchmarks comparing FluxQueue and Celery across different workloads on a FastAPI server.
 
 ## Tested scenarios
 
@@ -17,11 +17,11 @@ Performance benchmarks comparing FluxQueue and Celery across different workloads
 
 ## Test Configuration
 
-Concurrency refers to the `--concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio` async threads within a single process.
+Concurrency refers to the `concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio` async threads within a single process.
 
 ## Email Processing Results
 
-All benchmarks process 10,000 emails.
+All benchmarks process 10,000 requests, each enqueues a task that sends an email on a local SMTP server. Email has html as body and its total size is about 4.4kb and both Celery and FluxQueue takes about 5 seconds to finish the task. The tasks are done Asynchronously.
 
 #### Celery
 
@@ -32,7 +32,7 @@ All benchmarks process 10,000 emails.
 - **Average RAM Usage**: 5,487.89 MB
 - **Average CPU Usage**: 1.05% (of total 16-core CPU)
 
-#### FluxQueue (Single Process)
+#### FluxQueue (Single Worker)
 
 - **Total Requests**: 10,000
 - **Concurrency**: 75 per process
@@ -41,7 +41,7 @@ All benchmarks process 10,000 emails.
 - **Average RAM Usage**: 88.27 MB
 - **Average CPU Usage**: 0.72% (of total 16-core CPU)
 
-#### FluxQueue (75 fluxqueue workers)
+#### FluxQueue (75 Workers)
 
 - **Total Requests**: 10,000
 - **Concurrency**: 75 per process

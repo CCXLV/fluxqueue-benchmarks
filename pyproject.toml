@@ -9,22 +9,19 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13.11"
 dependencies = [
-    "psutil",
+    "fastapi[standard]",
     "aiosmtplib",
-]
-
-[project.optional-dependencies]
-dev = ["ruff"]
-fastapi = [
     "fluxqueue",
     "celery",
     "redis",
-    "fastapi[standard]",
 ]
 
-[tool.ruff]
-line-length = 88
-indent-width = 4
+[project.optional-dependencies]
+dev = ["uv", "black", "ruff"]
+
+[tool.black]
+line-length = 79
+preview = true
 
 [tool.ruff.lint]
 select = [

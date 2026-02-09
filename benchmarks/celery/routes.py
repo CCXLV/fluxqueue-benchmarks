@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from benchmarks.fastapi.fluxq.mail.configs import create_welcome_email
-from benchmarks.fastapi.fluxq.requests import WelcomeEmailBody
+from benchmarks.mail.configs import create_welcome_email
+from benchmarks.requests import WelcomeEmailBody
 
 from .core import send_email_task
 
@@ -14,6 +14,8 @@ def welcome_email(request_body: WelcomeEmailBody):
         request_body.name, request_body.username, request_body.email
     )
 
-    send_email_task.delay("Welcome to FluxQueue", request_body.email, email_config)  # type: ignore
+    send_email_task.delay(  # type: ignore
+        "Welcome to FluxQueue", request_body.email, email_config
+    )
 
     return {"message": "Thanks for using FluxQueue!"}
