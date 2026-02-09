@@ -1,6 +1,5 @@
 import os
-import smtplib
-from contextlib import asynccontextmanager, contextmanager, suppress
+from contextlib import asynccontextmanager
 from email.message import EmailMessage
 from typing import TypedDict
 
@@ -29,18 +28,8 @@ class EmailConfig(TypedDict):
     footer_bottom: str | None
 
 
-@contextmanager
-def get_email_client_sync():
-    client = smtplib.SMTP("localhost", 2525)
-    try:
-        yield client
-    finally:
-        with suppress(Exception):
-            client.quit()
-
-
 @asynccontextmanager
-async def get_email_client_async():
+async def get_email_client():
     client = aiosmtplib.SMTP(
         hostname="localhost",
         port=2525,
@@ -53,30 +42,7 @@ async def get_email_client_async():
             await client.quit()
 
 
-def send_email_sync(
-    *,
-    email_client: smtplib.SMTP,
-    to_email: str,
-    subject: str,
-    config: EmailConfig,
-    template: str = "emails/template.html",
-):
-    html_content = templates.get_template(template).render(
-        docs_url=DOCS_URL,
-        logo_url=LOGO_URL,
-        **config,
-    )
-
-    message = EmailMessage()
-    message["From"] = "fluxqueue-benchmarks@test.com"
-    message["To"] = to_email
-    message["Subject"] = subject
-    message.set_content(html_content, subtype="html")
-
-    email_client.send_message(message)
-
-
-async def send_email_async(
+async def send_email(
     *,
     email_client: aiosmtplib.SMTP,
     to_email: str,
