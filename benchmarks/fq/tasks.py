@@ -1,18 +1,13 @@
-from benchmarks.mail.core import (
-    EmailConfig,
-    get_email_client,
-    send_email,
-)
+from benchmarks.mail.tasks import send_email_async_task, send_email_sync_task
 
 from .core import fluxqueue
 
 
-@fluxqueue.task()
-async def send_email_task(subject: str, to_email: str, config: EmailConfig):
-    async with get_email_client() as email_client:
-        await send_email(
-            email_client=email_client,
-            to_email=to_email,
-            subject=subject,
-            config=config,
-        )
+@fluxqueue.task(name="send-email-sync")
+def fq_send_email_sync_task(name: str, username: str, email: str):
+    send_email_sync_task(name, username, email)
+
+
+@fluxqueue.task(name="send-email-async")
+async def fq_send_email_async_task(name: str, username: str, email: str):
+    await send_email_async_task(name, username, email)
