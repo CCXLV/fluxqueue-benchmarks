@@ -61,6 +61,52 @@ is_multithreaded() {
     return 1
 }
 
+# Expand the list of PIDs we monitor to include process trees (useful for Celery-style workers)
+get_monitored_pids() {
+    # On macOS, just use the PIDs from the file as-is
+    if [ "$OS_TYPE" = "Darwin" ]; then
+        cat pids.log 2>/dev/null
+        return
+    fi
+
+    # On Linux, walk full process subtrees under the base PIDs
+    if [ ! -f pids.log ]; then
+        return
+    fi
+
+    local base_pids
+    base_pids=$(cat pids.log 2>/dev/null)
+
+    local all_pids=()
+    local frontier=()
+
+    # Seed with the base PIDs
+    for pid in $base_pids; do
+        all_pids+=("$pid")
+        frontier+=("$pid")
+    done
+
+    # BFS over children using ps --ppid to capture all descendants
+    while ((${#frontier[@]})); do
+        local new_frontier=()
+
+        for ppid in "${frontier[@]}"; do
+            if ps -p "$ppid" >/dev/null 2>&1; then
+                while read -r child; do
+                    [ -z "$child" ] && continue
+                    all_pids+=("$child")
+                    new_frontier+=("$child")
+                done < <(ps --ppid "$ppid" -o pid= 2>/dev/null)
+            fi
+        done
+
+        frontier=("${new_frontier[@]}")
+    done
+
+    # Deduplicate and output as a flat list
+    printf '%s\n' "${all_pids[@]}" | sort -n | uniq
+}
+
 # Helper to format epoch seconds in a portable way
 format_epoch() {
     local epoch=$1
@@ -71,16 +117,22 @@ format_epoch() {
     fi
 }
 
+# Capture the baseline set of PIDs we will monitor for the entire session
+BASELINE_PIDS=$(get_monitored_pids)
+TOTAL_BASELINE=$(echo "$BASELINE_PIDS" | wc -w | awk '{print $1}')
+
 # Get initial CPU times (Linux /proc only)
 if [ "$OS_TYPE" != "Darwin" ]; then
-    for pid in $(cat pids.log 2>/dev/null); do
+    # Track previous total CPU jiffies for system-wide baseline
+    prev_total_jiffies=$(awk '/^cpu / {sum=0; for (i=2; i<=NF; i++) sum+=$i; print sum}' /proc/stat)
+
+    for pid in $BASELINE_PIDS; do
         if [ -f "/proc/$pid/stat" ]; then
             stat_content=$(cat /proc/$pid/stat)
             utime=$(echo "$stat_content" | awk '{print $14}')
             stime=$(echo "$stat_content" | awk '{print $15}')
             prev_utime[$pid]=$utime
             prev_stime[$pid]=$stime
-            prev_time[$pid]=$(date +%s%N)
         fi
     done
 fi
@@ -96,11 +148,24 @@ while true; do
     total_cpu=0
     count=0
     alive_count=0
-    current_time=$(date +%s%N)
     
     echo "=== $(date '+%Y-%m-%d %H:%M:%S') ===" >> "$TEMP_DATA"
+
+    # Use the baseline set of PIDs (masters + workers) for the entire session
+    monitored_pids="$BASELINE_PIDS"
+    total_monitored="$TOTAL_BASELINE"
+
+    # For Linux, precompute total CPU jiffies delta for this sampling interval
+    if [ "$OS_TYPE" != "Darwin" ]; then
+        current_total_jiffies=$(awk '/^cpu / {sum=0; for (i=2; i<=NF; i++) sum+=$i; print sum}' /proc/stat)
+        total_jiffies_diff=$((current_total_jiffies - prev_total_jiffies))
+        if [ "$total_jiffies_diff" -le 0 ] 2>/dev/null; then
+            total_jiffies_diff=1
+        fi
+        prev_total_jiffies=$current_total_jiffies
+    fi
     
-    for pid in $(cat pids.log 2>/dev/null); do
+    for pid in $monitored_pids; do
         if [ "$OS_TYPE" = "Darwin" ]; then
             # macOS path: use ps for CPU/memory
             if ps -p "$pid" >/dev/null 2>&1; then
@@ -142,6 +207,7 @@ while true; do
                 ((count++))
             fi
         else
+            # Linux /proc-based path
             if [ -d "/proc/$pid" ]; then
                 alive_count=$((alive_count + 1))
                 comm=$(cat /proc/$pid/comm 2>/dev/null || echo "unknown")
@@ -151,25 +217,25 @@ while true; do
                 if is_multithreaded "$pid"; then
                     is_multi=true
                 fi
-                
                 if [ -f "/proc/$pid/stat" ]; then
                     stat_content=$(cat /proc/$pid/stat)
                     utime=$(echo "$stat_content" | awk '{print $14}')
                     stime=$(echo "$stat_content" | awk '{print $15}')
                     
                     cpu_usage=0
-                    if [ -n "${prev_utime[$pid]}" ] && [ "${prev_utime[$pid]}" -ne 0 ] 2>/dev/null; then
-                        time_diff=$((current_time - prev_time[$pid]))
+                    if [ -n "${prev_utime[$pid]}" ]; then
                         cpu_diff=$(( (utime + stime) - (prev_utime[$pid] + prev_stime[$pid]) ))
-                        
-                        if [ "$time_diff" -gt 0 ] 2>/dev/null; then
-                            # Convert ns to seconds for more accurate interval
-                            time_diff_sec=$(awk "BEGIN {printf \"%.6f\", $time_diff / 1000000000}")
-                            # Calculate raw CPU percentage (can exceed 100 for multi-core)
-                            cpu_usage=$(awk "BEGIN {printf \"%.2f\", (100 * $cpu_diff) / ($CLK_TCK * $time_diff_sec)}")
-                        fi
+                    else
+                        cpu_diff=0
                     fi
                     
+                    # Calculate per-process CPU percentage relative to total system CPU
+                    if [ "$total_jiffies_diff" -gt 0 ] 2>/dev/null; then
+                        cpu_usage=$(awk "BEGIN {printf \"%.2f\", (100 * $cpu_diff) / $total_jiffies_diff}")
+                    else
+                        cpu_usage=0
+                    fi
+
                     # Calculate per-core CPU if multi-threaded
                     if [ "$is_multi" = true ] && [ "$(echo "$cpu_usage > 0" | bc -l)" -eq 1 ] 2>/dev/null; then
                         cpu_per_core=$(awk "BEGIN {printf \"%.2f\", $cpu_usage / $NUM_CORES}")
@@ -179,7 +245,6 @@ while true; do
                     
                     prev_utime[$pid]=$utime
                     prev_stime[$pid]=$stime
-                    prev_time[$pid]=$current_time
                     
                     if [ -f "/proc/$pid/status" ]; then
                         vmrss=$(grep "^VmRSS:" /proc/$pid/status | awk '{print $2}')
@@ -207,10 +272,10 @@ while true; do
         fi
     done
     
-    # Check if all processes are dead
-    if [ $alive_count -eq 0 ]; then
+    # Stop as soon as any baseline PID exits (so averages only cover the full pool)
+    if [ "$alive_count" -lt "$total_monitored" ]; then
         echo "---" >> "$TEMP_DATA"
-        echo "All processes terminated at $(date)" >> "$TEMP_DATA"
+        echo "Monitoring stopped early at $(date) because at least one monitored PID exited." >> "$TEMP_DATA"
         break
     fi
     
@@ -221,7 +286,7 @@ while true; do
     total_mb=$(awk "BEGIN {printf \"%.2f\", $total_rss/1024}")
     total_gb=$(awk "BEGIN {printf \"%.2f\", $total_rss/1024/1024}")
     printf "TOTAL (%d/%d alive): CPU: %s%% (%.2f%% per-core)  |  RSS: %d KB (%s MB) (%s GB)\n" \
-           "$alive_count" "$(wc -w < pids.log)" "$total_cpu" "$total_cpu_per_core" "$total_rss" "$total_mb" "$total_gb" >> "$TEMP_DATA"
+           "$alive_count" "$total_monitored" "$total_cpu" "$total_cpu_per_core" "$total_rss" "$total_mb" "$total_gb" >> "$TEMP_DATA"
     echo "" >> "$TEMP_DATA"
     
     # Update statistics - track raw CPU only, calculate per-core from it
@@ -237,7 +302,7 @@ while true; do
     
     # Show progress on console
     printf "\rMonitoring: %d/%d alive, CPU: %s%% (%.2f%% per-core), RSS: %s MB       " \
-           "$alive_count" "$(wc -w < pids.log)" "$total_cpu" "$total_cpu_per_core" "$total_mb"
+           "$alive_count" "$total_monitored" "$total_cpu" "$total_cpu_per_core" "$total_mb"
     
     sleep $INTERVAL
 done
