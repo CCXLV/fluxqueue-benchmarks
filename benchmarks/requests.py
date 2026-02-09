@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class WelcomeEmailBody(BaseModel):
+class BasicDataRequest(BaseModel):
     username: str
     name: str
     email: str

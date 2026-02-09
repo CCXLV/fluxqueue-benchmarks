@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from benchmarks.requests import WelcomeEmailBody
+from benchmarks.requests import BasicDataRequest
 
 from .core import celery_send_email_task
 
@@ -8,7 +8,7 @@ celery_router = APIRouter()
 
 
 @celery_router.get("/email")
-def email_async(request_body: WelcomeEmailBody):
+def email_async(request_body: BasicDataRequest):
     celery_send_email_task.delay(  # type: ignore
         request_body.name, request_body.username, request_body.email
     )

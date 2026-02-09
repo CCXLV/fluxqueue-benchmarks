@@ -15,14 +15,17 @@ dependencies = [
     "redis",
     "aiosmtplib",
     "sqlalchemy",
+    "sqlalchemy-utils",
+    "alembic",
+    "psycopg2-binary",
+    "asyncpg",
 ]
 
 [project.optional-dependencies]
-dev = ["uv", "black", "ruff"]
+dev = ["uv", "ruff"]
 
-[tool.black]
-line-length = 79
-preview = true
+[tool.ruff]
+line-length = 88
 
 [tool.ruff.lint]
 select = [
