@@ -9,13 +9,19 @@ Performance benchmarks comparing FluxQueue and Celery across different workloads
 - [ ] DB Queries
 - ...
 
-## Email Processing
+## Test machine
 
-### Test Configuration
+- **CPU**: 12th Gen Intel Core i5-12500H (16 logical CPUs)
+- **Memory**: 16 GB RAM
+- **OS**: Linux (Arch), kernel 6.18.7-arch1-1 (x86_64)
 
-All benchmarks process 10,000 email requests. Concurrency refers to the `--concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio` async threads within a single process.
+## Test Configuration
 
-### Results
+Concurrency refers to the `--concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio` async threads within a single process.
+
+## Email Processing Results
+
+All benchmarks process 10,000 emails.
 
 #### Celery
 
