@@ -2,6 +2,13 @@
 
 Performance benchmarks comparing FluxQueue and Celery across different workloads.
 
+## Tested scenarios
+
+- [x] Emails
+- [ ] API Calling
+- [ ] DB Queries
+- ...
+
 ## Email Processing
 
 ### Test Configuration
