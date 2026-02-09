@@ -52,7 +52,7 @@ All benchmarks process 10,000 emails.
 
 ### Summary
 
-FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (~88 MB vs 5,488 MB RAM, ~0.7% vs 1.05% CPU). When scaled to 75 workers, FluxQueue completes the same workload ~12.7x faster than Celery (~52.9 seconds vs 672.9 seconds) with similar RAM usage but lower CPU utilization (~4.8% vs 1.05%).
+FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (~88 MB vs 5,488 MB RAM, ~0.7% vs 1.05% CPU). When scaled to 75 workers, FluxQueue completes the same workload ~12.7x faster than Celery (~52.9 seconds vs 672.9 seconds) with similar RAM usage but moderately higher CPU utilization (~4.8% vs 1.05%).
 
 Key points:
 
