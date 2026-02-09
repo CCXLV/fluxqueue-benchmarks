@@ -1,3 +1,3 @@
-__all__ = ["send_email_task"]
+__all__ = ["fq_send_email_task"]
 
-from .tasks import send_email_task
+from .tasks import fq_send_email_task

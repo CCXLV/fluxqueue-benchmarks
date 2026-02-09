@@ -10,10 +10,11 @@ readme = "README.md"
 requires-python = ">=3.13.11"
 dependencies = [
     "fastapi[standard]",
-    "aiosmtplib",
     "fluxqueue",
     "celery",
     "redis",
+    "aiosmtplib",
+    "sqlalchemy",
 ]
 
 [project.optional-dependencies]

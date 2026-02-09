@@ -1,21 +1,16 @@
 from fastapi import APIRouter
 
-from benchmarks.mail.configs import create_welcome_email
 from benchmarks.requests import WelcomeEmailBody
 
-from .core import send_email_task
+from .core import celery_send_email_task
 
 celery_router = APIRouter()
 
 
-@celery_router.post("/emails/welcome")
-def welcome_email(request_body: WelcomeEmailBody):
-    email_config = create_welcome_email(
+@celery_router.get("/email")
+def email_async(request_body: WelcomeEmailBody):
+    celery_send_email_task.delay(  # type: ignore
         request_body.name, request_body.username, request_body.email
-    )
-
-    send_email_task.delay(  # type: ignore
-        "Welcome to FluxQueue", request_body.email, email_config
     )
 
     return {"message": "Thanks for using FluxQueue!"}

@@ -21,7 +21,7 @@ Concurrency refers to the `concurrency` argument for both `fluxqueue` and `celer
 
 ## Email Processing Results
 
-All benchmarks process 10,000 requests, each enqueues a task that sends an email on a local SMTP server. Email has html as body and its total size is about 4.4kb and both Celery and FluxQueue takes about 5 seconds to finish the task. The tasks are done Asynchronously.
+All benchmarks process 10,000 requests, each enqueues a task that sends an email on a local SMTP server. Email has html as body and its total size is about 4.4kb and both Celery and FluxQueue takes about 5 seconds to finish the task. The tasks are done asynchronously.
 
 #### Celery
 
