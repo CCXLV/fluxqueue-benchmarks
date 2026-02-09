@@ -28,35 +28,35 @@ All benchmarks process 10,000 emails.
 - **Total Requests**: 10,000
 - **Concurrency**: 75
 - **Processes**: 75
-- **Duration**: 672.936 seconds
-- **Average RAM Usage**: 5,616 MB
-- **Average CPU Usage**: 67.5%
+- **Duration**: 672.939 seconds
+- **Average RAM Usage**: 5,487.89 MB
+- **Average CPU Usage**: 1.05% (of total 16-core CPU)
 
 #### FluxQueue (Single Process)
 
 - **Total Requests**: 10,000
 - **Concurrency**: 75 per process
 - **Processes**: 1
-- **Duration**: 671.204 seconds
-- **Average RAM Usage**: 89.09 MB
-- **Average CPU Usage**: 0.93%
+- **Duration**: 673.882 seconds
+- **Average RAM Usage**: 88.27 MB
+- **Average CPU Usage**: 0.72% (of total 16-core CPU)
 
 #### FluxQueue (75 fluxqueue workers)
 
 - **Total Requests**: 10,000
 - **Concurrency**: 75 per process
 - **Processes**: 75
-- **Duration**: 52.831 seconds
-- **Average RAM Usage**: 4,670.50 MB
-- **Average CPU Usage**: 54.59%
+- **Duration**: 52.856 seconds
+- **Average RAM Usage**: 4,615.41 MB
+- **Average CPU Usage**: 4.84% (of total 16-core CPU)
 
 ### Summary
 
-FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (89 MB vs 5,616 MB RAM, 0.93% vs 67.5% CPU). When scaled to 75 workers, FluxQueue completes the same workload 12.7x faster than Celery (52.8 seconds vs 672.9 seconds) with similar resource usage.
+FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (~88 MB vs 5,488 MB RAM, ~0.7% vs 1.05% CPU). When scaled to 75 workers, FluxQueue completes the same workload ~12.7x faster than Celery (~52.9 seconds vs 672.9 seconds) with similar RAM usage but lower CPU utilization (~4.8% vs 1.05%).
 
 Key points:
 
 - FluxQueue matches Celery’s throughput with ~98% less memory in single-worker mode.
 - Under equal RAM constraints, FluxQueue scales horizontally and completes the same workload ~12.7× faster than Celery.
 - FluxQueue achieves ~15× higher throughput per GB of RAM compared to Celery.
-- Celery is memory-bound, while FluxQueue remains CPU-bound under load.
+- Celery is memory-heavy, while FluxQueue achieves similar or better throughput with far less memory and CPU usage.
