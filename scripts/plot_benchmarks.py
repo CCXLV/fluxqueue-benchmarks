@@ -76,7 +76,7 @@ def plot_email_time_and_ram(output_path: str = "public/emails_overview.png"):
     - FluxQueue (1 worker)
     - FluxQueue (75 workers)
     """
-    labels = ["Celery", "FluxQueue (1 worker)", "FluxQueue (75 workers)"]
+    labels = ["Celery (1 worker)", "FluxQueue (1 worker)", "FluxQueue (75 workers)"]
     celery_color = "#37814A"
     flux_color = "#fac500ff"
 
@@ -114,7 +114,7 @@ def plot_db_time_and_ram(output_path: str = "public/db_overview.png"):
     - Celery (1 worker, 75 processes)
     - FluxQueue (1 worker, 75 internal executors)
     """
-    labels = ["Celery", "FluxQueue (1 worker)"]
+    labels = ["Celery (1 worker)", "FluxQueue (1 worker)"]
     celery_color = "#37814A"
     flux_color = "#fac500ff"
 
