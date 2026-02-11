@@ -2,6 +2,10 @@
 
 Performance benchmarks comparing FluxQueue and Celery across different workloads on a FastAPI server.
 
+## Charts
+
+![Celery vs FluxQueue – Emails & DB Benchmarks](public/combined_overview.png)
+
 ## Tested scenarios
 
 - [x] Emails
