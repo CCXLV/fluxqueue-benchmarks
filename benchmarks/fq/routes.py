@@ -1,10 +1,8 @@
 from fastapi import APIRouter
 
-from benchmarks.database.core import DbSession
-from benchmarks.database.models import User
 from benchmarks.requests import BasicDataRequest
 
-from .tasks import fq_send_email_task
+from .tasks import fq_calculate_commission_task, fq_send_email_task
 
 fluxq_router = APIRouter()
 
@@ -18,15 +16,8 @@ async def email_async(request_body: BasicDataRequest):
     return {"message": "Thanks for using FluxQueue!"}
 
 
-@fluxq_router.post("/db/register")
-async def db_register(db_session: DbSession, request_body: BasicDataRequest):
-    user = User(
-        username=request_body.username,
-        name=request_body.name,
-        email=request_body.email,
-    )
+@fluxq_router.post("/db/{email}")
+async def calculate_commission(email: str):
+    await fq_calculate_commission_task(email)
 
-    db_session.add(user)
-    await db_session.commit()
-
-    return {"message": "User was registered"}
+    return {"message": "Calculations has started"}

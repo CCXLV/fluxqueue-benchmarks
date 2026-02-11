@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from benchmarks.requests import BasicDataRequest
 
-from .core import celery_send_email_task
+from .core import celery_calculate_commission, celery_send_email_task
 
 celery_router = APIRouter()
 
@@ -14,3 +14,10 @@ def email_async(request_body: BasicDataRequest):
     )
 
     return {"message": "Thanks for using FluxQueue!"}
+
+
+@celery_router.post("/db/{email}")
+def calculate_commission(email: str):
+    celery_calculate_commission.delay(email)  # type: ignore
+
+    return {"message": "Calculations has started"}

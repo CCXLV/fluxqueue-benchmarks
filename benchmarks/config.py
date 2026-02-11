@@ -1,7 +1,10 @@
 from pathlib import Path
 
+from dotenv import load_dotenv
 from starlette.config import Config
 from starlette.datastructures import Secret
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
 
