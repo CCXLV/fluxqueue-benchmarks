@@ -29,7 +29,7 @@ Performance benchmarks comparing FluxQueue and Celery across different workloads
 
 ## Test Configuration
 
-Concurrency refers to the `concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio` async threads within a single process which are called `executors`.
+Concurrency refers to the `concurrency` argument for both `fluxqueue` and `celery`, but they have different meanings internally. For `celery`, it also means the number of Python processes it's going to spawn. For `fluxqueue`, it means the number of `tokio task`s its going to spawn.
 
 ## Email Processing Results
 
