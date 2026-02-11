@@ -6,6 +6,14 @@ Performance benchmarks comparing FluxQueue and Celery across different workloads
 
 ![Celery vs FluxQueue – Emails & DB Benchmarks](public/combined_overview.png)
 
+### Email overview
+
+![Email Benchmark – Duration & RAM](public/emails_overview.png)
+
+### DB overview
+
+![DB Benchmark – Duration & RAM](public/db_overview.png)
+
 ## Tested scenarios
 
 - [x] Emails

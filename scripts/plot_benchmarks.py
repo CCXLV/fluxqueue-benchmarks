@@ -1,95 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_email_benchmarks(output_prefix: str = "emails"):
-    """
-    Plot duration, RAM and CPU usage for the email benchmarks.
-    """
-    labels = ["Celery", "FluxQueue (1 worker)", "FluxQueue (75 workers)"]
-
-    # Data from README
-    duration = [672.939, 673.882, 52.856]  # seconds
-    ram_mb = [5487.89, 88.27, 4615.41]  # MB
-    cpu_pct = [1.05, 0.72, 4.84]  # % of total CPU
-
-    x = range(len(labels))
-
-    # Duration
-    plt.figure(figsize=(8, 5))
-    plt.bar(x, duration, color=["#f97316", "#22c55e", "#16a34a"])
-    plt.xticks(x, labels, rotation=15, ha="right")
-    plt.ylabel("Duration (seconds)")
-    plt.title("Email Benchmark – Duration")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_duration.png", dpi=150)
-    plt.close()
-
-    # RAM
-    plt.figure(figsize=(8, 5))
-    plt.bar(x, ram_mb, color=["#f97316", "#22c55e", "#16a34a"])
-    plt.xticks(x, labels, rotation=15, ha="right")
-    plt.ylabel("Average RAM Usage (MB)")
-    plt.title("Email Benchmark – RAM Usage")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_ram.png", dpi=150)
-    plt.close()
-
-    # CPU
-    plt.figure(figsize=(8, 5))
-    plt.bar(x, cpu_pct, color=["#f97316", "#22c55e", "#16a34a"])
-    plt.xticks(x, labels, rotation=15, ha="right")
-    plt.ylabel("Average CPU Usage (% of total CPU)")
-    plt.title("Email Benchmark – CPU Usage")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_cpu.png", dpi=150)
-    plt.close()
-
-
-def plot_db_benchmarks(output_prefix: str = "db"):
-    """
-    Plot duration, RAM and CPU usage for the DB query benchmarks.
-    """
-    labels = ["Celery", "FluxQueue"]
-
-    # Data from README
-    duration = [78.547, 63.110]  # seconds
-    ram_mb = [7046.54, 87.41]  # MB
-    cpu_pct = [8.88, 1.27]  # % of total CPU
-
-    x = range(len(labels))
-
-    # Duration
-    plt.figure(figsize=(6, 4))
-    plt.bar(x, duration, color=["#f97316", "#22c55e"])
-    plt.xticks(x, labels)
-    plt.ylabel("Duration (seconds)")
-    plt.title("DB Benchmark – Duration")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_duration.png", dpi=150)
-    plt.close()
-
-    # RAM
-    plt.figure(figsize=(6, 4))
-    plt.bar(x, ram_mb, color=["#f97316", "#22c55e"])
-    plt.xticks(x, labels)
-    plt.ylabel("Average RAM Usage (MB)")
-    plt.title("DB Benchmark – RAM Usage")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_ram.png", dpi=150)
-    plt.close()
-
-    # CPU
-    plt.figure(figsize=(6, 4))
-    plt.bar(x, cpu_pct, color=["#f97316", "#22c55e"])
-    plt.xticks(x, labels)
-    plt.ylabel("Average CPU Usage (% of total CPU)")
-    plt.title("DB Benchmark – CPU Usage")
-    plt.tight_layout()
-    plt.savefig(f"{output_prefix}_cpu.png", dpi=150)
-    plt.close()
-
-
-def plot_combined(output_path: str = "combined_overview.png"):
+def plot_combined(output_path: str = "public/combined_overview.png"):
     """
     Single figure comparing Celery vs FluxQueue across both benchmarks
     (emails + DB) for duration, RAM and CPU.
@@ -112,13 +24,16 @@ def plot_combined(output_path: str = "combined_overview.png"):
 
     x = range(len(labels))
 
+    celery_color = "#37814A"  # Celery green
+    flux_color = "#fac500ff"  # FluxQueue yellow
+
     fig, axes = plt.subplots(1, 3, figsize=(15, 4))
 
     # Duration
     axes[0].bar(
         x,
         duration,
-        color=["#f97316", "#22c55e", "#f97316", "#22c55e"],
+        color=[celery_color, flux_color, celery_color, flux_color],
     )
     axes[0].set_xticks(x)
     axes[0].set_xticklabels(labels, rotation=20, ha="right")
@@ -129,7 +44,7 @@ def plot_combined(output_path: str = "combined_overview.png"):
     axes[1].bar(
         x,
         ram_mb,
-        color=["#f97316", "#22c55e", "#f97316", "#22c55e"],
+        color=[celery_color, flux_color, celery_color, flux_color],
     )
     axes[1].set_xticks(x)
     axes[1].set_xticklabels(labels, rotation=20, ha="right")
@@ -141,7 +56,7 @@ def plot_combined(output_path: str = "combined_overview.png"):
     axes[2].bar(
         x,
         cpu_pct,
-        color=["#f97316", "#22c55e", "#f97316", "#22c55e"],
+        color=[celery_color, flux_color, celery_color, flux_color],
     )
     axes[2].set_xticks(x)
     axes[2].set_xticklabels(labels, rotation=20, ha="right")
@@ -154,10 +69,87 @@ def plot_combined(output_path: str = "combined_overview.png"):
     plt.close(fig)
 
 
+def plot_email_time_and_ram(output_path: str = "public/emails_overview.png"):
+    """
+    Single figure showing duration and RAM usage for:
+    - Celery (75 processes)
+    - FluxQueue (1 worker)
+    - FluxQueue (75 workers)
+    """
+    labels = ["Celery", "FluxQueue (1 worker)", "FluxQueue (75 workers)"]
+    celery_color = "#37814A"
+    flux_color = "#fac500ff"
+
+    # Data from README (emails benchmark)
+    duration = [672.939, 673.882, 52.856]  # seconds
+    ram_mb = [5487.89, 88.27, 4615.41]  # MB
+
+    x = range(len(labels))
+
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+    # Duration
+    axes[0].bar(x, duration, color=[celery_color, flux_color, flux_color])
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels(labels, rotation=20, ha="right")
+    axes[0].set_ylabel("Seconds")
+    axes[0].set_title("Email Benchmark – Duration")
+
+    # RAM (log scale to show big differences)
+    axes[1].bar(x, ram_mb, color=[celery_color, flux_color, flux_color])
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels(labels, rotation=20, ha="right")
+    axes[1].set_ylabel("RAM (MB, log scale)")
+    axes[1].set_yscale("log")
+    axes[1].set_title("Email Benchmark – RAM Usage")
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+
+def plot_db_time_and_ram(output_path: str = "public/db_overview.png"):
+    """
+    Single figure showing duration and RAM usage for:
+    - Celery (1 worker, 75 processes)
+    - FluxQueue (1 worker, 75 internal executors)
+    """
+    labels = ["Celery", "FluxQueue (1 worker)"]
+    celery_color = "#37814A"
+    flux_color = "#fac500ff"
+
+    # Data from README (DB benchmark)
+    duration = [78.547, 63.110]  # seconds
+    ram_mb = [7046.54, 87.41]  # MB
+
+    x = range(len(labels))
+
+    fig, axes = plt.subplots(1, 2, figsize=(8, 4))
+
+    # Duration
+    axes[0].bar(x, duration, color=[celery_color, flux_color])
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels(labels, rotation=20, ha="right")
+    axes[0].set_ylabel("Seconds")
+    axes[0].set_title("DB Benchmark – Duration")
+
+    # RAM (log scale)
+    axes[1].bar(x, ram_mb, color=[celery_color, flux_color])
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels(labels, rotation=20, ha="right")
+    axes[1].set_ylabel("RAM (MB, log scale)")
+    axes[1].set_yscale("log")
+    axes[1].set_title("DB Benchmark – RAM Usage")
+
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+
+
 def main():
-    plot_email_benchmarks()
-    plot_db_benchmarks()
     plot_combined()
+    plot_email_time_and_ram()
+    plot_db_time_and_ram()
 
 
 if __name__ == "__main__":
