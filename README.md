@@ -63,7 +63,7 @@ Key points:
 
 ## Database Query Results
 
-All benchmarks process 10,000 HTTP requests on a FastAPI server with 2 `uvicorn` workers. Each request enqueues a task that performs two `SELECT` queries on a 1M-row table, does some simple calculations, and inserts the result into another table.
+All benchmarks process 10,000 HTTP requests on a FastAPI server with 2 `uvicorn` workers. Each request enqueues a task that performs two `SELECT` queries on a 1M-row table, does some simple calculations, and inserts the result into another table in a Postgres database. Database connections and queries are done asynchronously using `asyncpg` library.
 
 #### Celery (1 worker, 75 processes)
 
