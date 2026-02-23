@@ -16,7 +16,7 @@ def plot_combined(output_path: str = "public/combined_overview.png"):
     db_ram = [7046.54, 87.41]
     db_cpu = [8.88, 1.27]
 
-    labels = ["Emails – Celery", "Emails – FluxQueue", "DB – Celery", "DB – FluxQueue"]
+    labels = ["Emails - Celery", "Emails - FluxQueue", "DB - Celery", "DB - FluxQueue"]
 
     duration = email_duration + db_duration
     ram_mb = email_ram + db_ram
@@ -40,7 +40,7 @@ def plot_combined(output_path: str = "public/combined_overview.png"):
     axes[0].set_ylabel("Seconds")
     axes[0].set_title("Duration")
 
-    # RAM (log scale – huge differences)
+    # RAM (log scale - huge differences)
     axes[1].bar(
         x,
         ram_mb,
@@ -63,7 +63,7 @@ def plot_combined(output_path: str = "public/combined_overview.png"):
     axes[2].set_ylabel("CPU (% of total)")
     axes[2].set_title("Average CPU Usage")
 
-    fig.suptitle("Celery vs FluxQueue – Emails & DB Benchmarks", fontsize=14)
+    fig.suptitle("Celery vs FluxQueue - Emails & DB Benchmarks", fontsize=14)
     fig.tight_layout(rect=[0, 0, 1, 0.92])
     fig.savefig(output_path, dpi=150)
     plt.close(fig)
@@ -93,7 +93,7 @@ def plot_email_time_and_ram(output_path: str = "public/emails_overview.png"):
     axes[0].set_xticks(x)
     axes[0].set_xticklabels(labels, rotation=20, ha="right")
     axes[0].set_ylabel("Seconds")
-    axes[0].set_title("Email Benchmark – Duration")
+    axes[0].set_title("Email Benchmark - Duration")
 
     # RAM (log scale to show big differences)
     axes[1].bar(x, ram_mb, color=[celery_color, flux_color, flux_color])
@@ -101,7 +101,7 @@ def plot_email_time_and_ram(output_path: str = "public/emails_overview.png"):
     axes[1].set_xticklabels(labels, rotation=20, ha="right")
     axes[1].set_ylabel("RAM (MB, log scale)")
     axes[1].set_yscale("log")
-    axes[1].set_title("Email Benchmark – RAM Usage")
+    axes[1].set_title("Email Benchmark - RAM Usage")
 
     fig.tight_layout()
     fig.savefig(output_path, dpi=150)
@@ -131,7 +131,7 @@ def plot_db_time_and_ram(output_path: str = "public/db_overview.png"):
     axes[0].set_xticks(x)
     axes[0].set_xticklabels(labels, rotation=20, ha="right")
     axes[0].set_ylabel("Seconds")
-    axes[0].set_title("DB Benchmark – Duration")
+    axes[0].set_title("DB Benchmark - Duration")
 
     # RAM (log scale)
     axes[1].bar(x, ram_mb, color=[celery_color, flux_color])
@@ -139,7 +139,7 @@ def plot_db_time_and_ram(output_path: str = "public/db_overview.png"):
     axes[1].set_xticklabels(labels, rotation=20, ha="right")
     axes[1].set_ylabel("RAM (MB, log scale)")
     axes[1].set_yscale("log")
-    axes[1].set_title("DB Benchmark – RAM Usage")
+    axes[1].set_title("DB Benchmark - RAM Usage")
 
     fig.tight_layout()
     fig.savefig(output_path, dpi=150)
