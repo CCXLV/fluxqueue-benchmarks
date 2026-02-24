@@ -1,4 +1,3 @@
-import threading
 from contextlib import asynccontextmanager
 
 from fastapi import HTTPException
@@ -25,10 +24,9 @@ async def fq_send_email_task(name: str, username: str, email: str):
 class DbContext(Context):
     def __init__(self) -> None:
         super().__init__()
-        self._local = threading.local()
 
-    def _get_local_registry(self) -> async_sessionmaker[AsyncSession]:
-        if not hasattr(self._local, "registry"):
+    def _get_local_session(self) -> async_sessionmaker[AsyncSession]:
+        if not self.thread_storage.get("session"):
             engine = create_async_engine(
                 SQLALCHEMY_DATABASE_URL,
                 pool_size=MAX_POOL_SIZE,
@@ -38,24 +36,22 @@ class DbContext(Context):
                 pool_recycle=3600,
             )
 
-            self._local.registry = async_sessionmaker(
+            self.thread_storage["session"] = async_sessionmaker(
                 bind=engine, expire_on_commit=False
             )
 
-        return self._local.registry
+        return self.thread_storage["session"]
 
     @asynccontextmanager
     async def session_context(self):
-        registry = self._get_local_registry()
-        async with registry() as session:
+        local_session = self._get_local_session()
+        async with local_session() as session:
             try:
                 yield session
                 await session.commit()
             except Exception:
                 await session.rollback()
                 raise
-            finally:
-                await session.close()
 
 
 async def calculate_user_commission(ctx: DbContext, email: str):
