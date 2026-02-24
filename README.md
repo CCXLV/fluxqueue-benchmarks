@@ -80,23 +80,23 @@ All benchmarks process 10,000 HTTP requests on a FastAPI server with 2 `uvicorn`
 #### Celery (1 worker, 75 processes)
 
 - **Total Requests**: 10,000
-- **Uvicorn Workers**: 2
+- **Uvicorn Workers**: 8
 - **Celery Workers**: 1
 - **Processes (concurrency)**: 75
-- **Duration**: 78.547 seconds
-- **Average RAM Usage**: 7,046.54 MB
-- **Average CPU Usage**: 8.88% (0.56% per core, 16 cores)
+- **Duration**: 120.652 seconds
+- **Average RAM Usage**: 7124.35 MB
+- **Average CPU Usage**: 8.09% (0.51% per core, 16 cores)
 
 #### FluxQueue (1 worker, 75 internal executors)
 
 - **Total Requests**: 10,000
-- **Uvicorn Workers**: 2
+- **Uvicorn Workers**: 8
 - **FluxQueue Workers**: 1
 - **Processes**: 1
 - **Internal Executors (concurrency)**: 75
-- **Duration**: 63.110 seconds
-- **Average RAM Usage**: 87.41 MB
-- **Average CPU Usage**: 1.27% (0.08% per core, 16 cores)
+- **Duration**: 98.638 seconds
+- **Average RAM Usage**: 108.30 MB
+- **Average CPU Usage**: 2.97% (0.19% per core, 16 cores)
 
 ### Summary (DB queries)
 

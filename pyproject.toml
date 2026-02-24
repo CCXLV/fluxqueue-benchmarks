@@ -7,23 +7,23 @@ name = "benchmarks"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13.11"
+requires-python = ">=3.13.10"
 dependencies = [
-    "uvicorn[standard]",
-    "fastapi[standard]",
-    "fluxqueue",
-    "celery",
-    "redis",
-    "aiosmtplib",
-    "sqlalchemy",
-    "sqlalchemy-utils",
-    "alembic",
-    "psycopg2-binary",
-    "asyncpg",
+  "uvicorn[standard]",
+  "fastapi[standard]",
+  "fluxqueue",
+  "celery",
+  "redis",
+  "aiosmtplib",
+  "sqlalchemy",
+  "sqlalchemy-utils",
+  "alembic",
+  "psycopg2-binary",
+  "asyncpg",
 ]
 
 [project.optional-dependencies]
-dev = ["uv", "ruff"]
+dev = ["ruff"]
 
 [tool.ruff]
 line-length = 88
