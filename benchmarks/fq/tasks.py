@@ -1,13 +1,16 @@
-import asyncio
-import sys
+import threading
 from contextlib import asynccontextmanager
 
 from fastapi import HTTPException
 from fluxqueue import Context
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from benchmarks.config import SQLALCHEMY_DATABASE_URL
-from benchmarks.database.core import MAX_POOL_SIZE
+from benchmarks.database.core import MAX_OVERFLOW, MAX_POOL_SIZE
 from benchmarks.database.models import CommissionRate, CommissionResult, RateType, User
 from benchmarks.tasks import send_email_task
 
@@ -22,25 +25,29 @@ async def fq_send_email_task(name: str, username: str, email: str):
 class DbContext(Context):
     def __init__(self) -> None:
         super().__init__()
-        self._registry = {}
+        self._local = threading.local()
 
-    def _get_local_factory(self):
-        loop = asyncio.get_running_loop()
-        loop_id = id(loop)
-        if loop_id not in self._registry:
+    def _get_local_registry(self) -> async_sessionmaker[AsyncSession]:
+        if not hasattr(self._local, "registry"):
             engine = create_async_engine(
-                SQLALCHEMY_DATABASE_URL, pool_size=MAX_POOL_SIZE
+                SQLALCHEMY_DATABASE_URL,
+                pool_size=MAX_POOL_SIZE,
+                max_overflow=MAX_OVERFLOW,
+                pool_timeout=30,
+                pool_pre_ping=True,
+                pool_recycle=3600,
             )
-            self._registry[loop_id] = async_sessionmaker(
+
+            self._local.registry = async_sessionmaker(
                 bind=engine, expire_on_commit=False
             )
-        return self._registry[loop_id]
+
+        return self._local.registry
 
     @asynccontextmanager
     async def session_context(self):
-        session_factory = self._get_local_factory()
-
-        async with session_factory() as session:
+        registry = self._get_local_registry()
+        async with registry() as session:
             try:
                 yield session
                 await session.commit()
@@ -80,9 +87,6 @@ async def calculate_user_commission(ctx: DbContext, email: str):
             total_earnings=user.earnings - total_commission,
         )
         db_session.add(commission_result)
-        await db_session.commit()
-
-        print(sys.getsizeof(ctx._registry))
 
 
 @fluxqueue.task_with_context(name="calculate-commission")
