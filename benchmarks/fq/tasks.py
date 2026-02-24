@@ -54,7 +54,8 @@ class DbContext(Context):
                 raise
 
 
-async def calculate_user_commission(ctx: DbContext, email: str):
+@fluxqueue.task_with_context(name="calculate-commission")
+async def fq_calculate_commission_task(ctx: DbContext, email: str):
     async with ctx.session_context() as db_session:
         user = await User.get_by_email(email, db_session)
 
@@ -83,8 +84,3 @@ async def calculate_user_commission(ctx: DbContext, email: str):
             total_earnings=user.earnings - total_commission,
         )
         db_session.add(commission_result)
-
-
-@fluxqueue.task_with_context(name="calculate-commission")
-async def fq_calculate_commission_task(ctx: DbContext, email: str):
-    await calculate_user_commission(ctx, email)
