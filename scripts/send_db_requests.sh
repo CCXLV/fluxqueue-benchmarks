@@ -29,7 +29,7 @@ head -n "$LIMIT" "$EMAILS_FILE" | while IFS= read -r email; do
   [[ -z "$email" ]] && continue
 
   echo "Sending load test for email: $email"
-  hey -n 1 -c 1 -m POST "${BASE_URL}/${email}"
+  hey -n 1 -c 1 -m GET "${BASE_URL}/${email}"
 done
 
 echo "Done sending requests."

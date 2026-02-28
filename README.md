@@ -40,27 +40,29 @@ All benchmarks process 10,000 requests on a FastAPI server with 1 `uvicorn` work
 - **Total Requests**: 10,000
 - **Concurrency**: 75
 - **Processes**: 75
-- **Duration**: 672.939 seconds
-- **Average RAM Usage**: 5,487.89 MB
-- **Average CPU Usage**: 1.05% (of total 16-core CPU)
+- **Duration**: 691.743 seconds
+- **Average RAM Usage**: 6525.47 MB
+- **Average CPU Usage**: 2.57% (of total 16-core CPU)
 
 #### FluxQueue (Single Worker)
 
 - **Total Requests**: 10,000
+- **Uvicorn Workers**: 8
 - **Concurrency**: 75 per process
 - **Processes**: 1
-- **Duration**: 673.882 seconds
-- **Average RAM Usage**: 88.27 MB
-- **Average CPU Usage**: 0.72% (of total 16-core CPU)
+- **Duration**: 674.072 seconds
+- **Average RAM Usage**: 107.32 MB
+- **Average CPU Usage**: 1.01% (of total 16-core CPU)
 
 #### FluxQueue (75 Workers)
 
 - **Total Requests**: 10,000
+- **Uvicorn Workers**: 8
 - **Concurrency**: 75 per process
 - **Processes**: 75
-- **Duration**: 52.856 seconds
-- **Average RAM Usage**: 4,615.41 MB
-- **Average CPU Usage**: 4.84% (of total 16-core CPU)
+- **Duration**: 58.735 seconds
+- **Average RAM Usage**: 6614.60 MB
+- **Average CPU Usage**: 8.93% (of total 16-core CPU)
 
 ### Summary (Emails)
 
