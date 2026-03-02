@@ -33,7 +33,7 @@ Concurrency refers to the `concurrency` argument for both `fluxqueue` and `celer
 
 ## Email Processing Results
 
-All benchmarks process 10,000 requests on a FastAPI server with 1 `uvicorn` worker, each enqueues a task that sends an email on a local SMTP server. Email has html as body and its total size is about 4.4kb and both Celery and FluxQueue takes about 5 seconds to finish the task. The tasks are done asynchronously.
+All benchmarks process 10,000 requests on a FastAPI server with 8 `uvicorn` workers, each enqueues a task that sends an email on a local SMTP server. Email has HTML as body and its total size is about 4.4kb and both Celery and FluxQueue take about 5 seconds to finish the task. The tasks are done asynchronously.
 
 #### Celery
 
@@ -48,7 +48,7 @@ All benchmarks process 10,000 requests on a FastAPI server with 1 `uvicorn` work
 
 - **Total Requests**: 10,000
 - **Uvicorn Workers**: 8
-- **Concurrency**: 75 per process
+- **Internal Executors (concurrency)**: 75
 - **Processes**: 1
 - **Duration**: 674.072 seconds
 - **Average RAM Usage**: 107.32 MB
@@ -58,26 +58,26 @@ All benchmarks process 10,000 requests on a FastAPI server with 1 `uvicorn` work
 
 - **Total Requests**: 10,000
 - **Uvicorn Workers**: 8
-- **Concurrency**: 75 per process
-- **Processes**: 75
+- **Internal Executors (concurrency)**: 75 per process
+- **Processes**: 75 (running workers)
 - **Duration**: 58.735 seconds
 - **Average RAM Usage**: 6614.60 MB
 - **Average CPU Usage**: 8.93% (of total 16-core CPU)
 
 ### Summary (Emails)
 
-FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (~88 MB vs 5,488 MB RAM, ~0.7% vs 1.05% CPU). When scaled to 75 workers, FluxQueue completes the same workload ~12.7x faster than Celery (~52.9 seconds vs 672.9 seconds) with similar RAM usage but moderately higher CPU utilization (~4.8% vs 1.05%).
+FluxQueue with a single worker (process) matches Celery's performance while using significantly less resources (~107 MB vs 6,525 MB RAM, ~1.0% vs 2.6% CPU). When scaled to 75 workers, FluxQueue completes the same workload ~11.8x faster than Celery (~58.7 seconds vs 691.7 seconds) with similar RAM usage but higher CPU utilization (~8.9% vs 2.6%).
 
 Key points:
 
 - FluxQueue matches Celery’s throughput with ~98% less memory in single-worker mode.
-- Under equal RAM constraints, FluxQueue scales horizontally and completes the same workload ~12.7x faster than Celery.
-- FluxQueue achieves ~15x higher throughput per GB of RAM compared to Celery.
+- Under equal RAM constraints, FluxQueue scales horizontally and completes the same workload ~11.8x faster than Celery.
+- FluxQueue achieves ~12x higher throughput per GB of RAM compared to Celery.
 - Celery is memory-heavy, while FluxQueue achieves similar or better throughput with far less memory and CPU usage for email workloads.
 
 ## Database Query Results
 
-All benchmarks process 10,000 HTTP requests on a FastAPI server with 2 `uvicorn` workers. Each request enqueues a task that performs two `SELECT` queries on a 1M-row table, does some simple calculations, and inserts the result into another table in a Postgres database. Database connections and queries are done asynchronously using `asyncpg` library.
+All benchmarks process 10,000 HTTP requests on a FastAPI server with 8 `uvicorn` workers. Each request enqueues a task that performs two `SELECT` queries on a 1M-row table, does some simple calculations, and inserts the result into another table in a Postgres database. Database connections and queries are done asynchronously using the `asyncpg` library.
 
 #### Celery (1 worker, 75 processes)
 
@@ -102,7 +102,7 @@ All benchmarks process 10,000 HTTP requests on a FastAPI server with 2 `uvicorn`
 
 ### Summary (DB queries)
 
-For database-heavy workloads, FluxQueue completes the same workload while using far fewer resources. In this benchmark, FluxQueue finishes in 63.1 seconds and Celery in 78.5 seconds, with FluxQueue using ~80x less RAM (≈87 MB vs ≈7,047 MB) and about 7x less CPU (1.27% vs 8.88% total CPU).
+For database-heavy workloads, FluxQueue completes the same workload while using far fewer resources. In this benchmark, FluxQueue finishes in 65.8 seconds and Celery in 76.0 seconds, with FluxQueue using ~56x less RAM (≈112 MB vs ≈6,295 MB) and about 2.3x less CPU (3.96% vs 9.00% total CPU).
 
 Key points:
 
