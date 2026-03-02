@@ -16,7 +16,7 @@ def email_async(request_body: BasicDataRequest):
     return {"message": "Thanks for using FluxQueue!"}
 
 
-@celery_router.post("/db/{email}")
+@celery_router.get("/db/{email}")
 def calculate_commission(email: str):
     celery_calculate_commission.delay(email)  # type: ignore
 

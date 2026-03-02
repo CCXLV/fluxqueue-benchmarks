@@ -7,14 +7,14 @@ def plot_combined(output_path: str = "public/combined_overview.png"):
     (emails + DB) for duration, RAM and CPU.
     """
     # Email: Celery vs FluxQueue (1 worker)
-    email_duration = [672.939, 673.882]
-    email_ram = [5487.89, 88.27]
-    email_cpu = [1.05, 0.72]
+    email_duration = [691.743, 674.072]
+    email_ram = [6525.47, 107.32]
+    email_cpu = [2.57, 1.01]
 
     # DB: Celery vs FluxQueue (1 worker)
-    db_duration = [78.547, 63.110]
-    db_ram = [7046.54, 87.41]
-    db_cpu = [8.88, 1.27]
+    db_duration = [75.980, 65.777]
+    db_ram = [6295.37, 112.42]
+    db_cpu = [9.00, 3.96]
 
     labels = ["Emails - Celery", "Emails - FluxQueue", "DB - Celery", "DB - FluxQueue"]
 
@@ -81,8 +81,8 @@ def plot_email_time_and_ram(output_path: str = "public/emails_overview.png"):
     flux_color = "#fac500ff"
 
     # Data from README (emails benchmark)
-    duration = [672.939, 673.882, 52.856]  # seconds
-    ram_mb = [5487.89, 88.27, 4615.41]  # MB
+    duration = [691.743, 674.072, 58.735]  # seconds
+    ram_mb = [6525.47, 107.32, 6614.60]  # MB
 
     x = range(len(labels))
 
@@ -119,8 +119,8 @@ def plot_db_time_and_ram(output_path: str = "public/db_overview.png"):
     flux_color = "#fac500ff"
 
     # Data from README (DB benchmark)
-    duration = [78.547, 63.110]  # seconds
-    ram_mb = [7046.54, 87.41]  # MB
+    duration = [75.980, 65.777]  # seconds
+    ram_mb = [6295.37, 112.42]  # MB
 
     x = range(len(labels))
 

@@ -16,3 +16,5 @@ wheels/
 .env
 
 scripts/emails.txt
+
+fluxqueue-worker

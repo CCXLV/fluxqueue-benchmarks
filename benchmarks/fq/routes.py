@@ -16,7 +16,7 @@ async def email_async(request_body: BasicDataRequest):
     return {"message": "Thanks for using FluxQueue!"}
 
 
-@fluxq_router.post("/db/{email}")
+@fluxq_router.get("/db/{email}")
 async def calculate_commission(email: str):
     await fq_calculate_commission_task(email)
 
